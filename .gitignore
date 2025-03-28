@@ -1,3 +1,10 @@
 .vscode/
 
 build/
+
+*.gz
+*.xz
+8.deb
+*.tar
+package/DEBIAN/control
+package/DEBIAN/changelog
