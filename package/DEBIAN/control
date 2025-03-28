@@ -1,0 +1,12 @@
+Package: starship-prompt
+Version: 25.03.12-0959 25.03.12-0959 25.03.12-0959
+Section: utils
+Priority: optional
+Maintainer: Michael Schaecher <MichaelLeeSchaecher@gmail.com> Michael Schaecher <MichaelLeeSchaecher@gmail.com> Michael Schaecher <MichaelLeeSchaecher@gmail.com>
+Installed-Size: 994800
+Homepage: https://github.com/MichaelSchaecher/starship-prompt https://github.com/MichaelSchaecher/starship-prompt https://github.com/MichaelSchaecher/starship-prompt
+Architecture: amd64
+Depends: systemd, bash (>= 4.4) systemd, bash (>= 4.4) systemd, bash (>= 4.4)
+Build-Depends: debhelper, make (>= 4.1), dpkg-dev, dpkg-changelog debhelper, make (>= 4.1), dpkg-dev, dpkg-changelog debhelper, make (>= 4.1), dpkg-dev, dpkg-changelog
+Description: Modernize the shell prompt with Starship and
+    keep it up to date without having to manually download/install.
