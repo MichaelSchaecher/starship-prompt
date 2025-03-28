@@ -1,0 +1,12 @@
+Package: starship-prompt
+Version:
+Section: utils
+Priority: optional
+Maintainer:
+Installed-Size:
+Homepage:
+Architecture: amd64
+Depends:
+Build-Depends:
+Description: Modernize the shell prompt with Starship and
+    keep it up to date without having to manually download/install.
