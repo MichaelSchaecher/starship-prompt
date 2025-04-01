@@ -3,7 +3,7 @@
 # Copyright ©️ 2024 Michael Schaecher under the MIT license.
 
 appName="starship-update"
-appVersion="$(cat /usr/local/bin/starship-update/version || echo "unknown")"
+appVersion="$(cat /usr/local/doc/starship-update/version || echo "unknown")"
 
 dirURL="https://github.com/starship/starship/releases/latest/download/"
 archType="starship-x86_64-unknown-linux-musl.tar.gz"
@@ -33,7 +33,6 @@ test "$(id -u)" -ne "0" && echo "You must be root to run this script" && exit 1
 case "${1}" in
     "version"           ) echo "${versionInfo}" && exit 0                              ;;
     "help"              ) echo "${helpInfo}" && exit 0                                 ;;
-    *                   ) echo "Error: Unsupported architecture $(uname -m)" && exit 1 ;;
 esac
 
 # Check is starship is installed already.
