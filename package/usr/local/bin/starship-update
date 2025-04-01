@@ -2,21 +2,44 @@
 
 # Copyright ©️ 2024 Michael Schaecher under the MIT license.
 
+appName="starship-update"
+appVersion="$(cat /usr/local/bin/starship-update/version || echo "unknown")"
+
 dirURL="https://github.com/starship/starship/releases/latest/download/"
 downloadFile="/tmp/starship.tar.gz"
+
+versionInfo="$(cat <<EOF
+${appName} - [VERSION] ${appVersion} - $(date +%Y-%m-%d): Download and install the latest version of starship
+EOF
+)"
+
+helpInfo="$(cat <<EOF
+${versionInfo}
+
+Usage: ${appName} [OPTIONS]
+
+Options:
+  -h, --help          Show this help message and exit
+  -v, --version       Show version information and exit
+
+EOF
+)"
 
 # Check if the user is root
 test "$(id -u)" -ne "0" && echo "You must be root to run this script" && exit 1
 
 case "$(uname -m)" in
-    "x86_64"            )   arch="starship-x86_64-unknown-linux-musl.tar.gz"   ;;
-
-    "aarch64"           )   arch="starship-aarch64-unknown-linux-musl.tar.gz"  ;;
+    "x86_64"            ) arch="starship-x86_64-unknown-linux-musl.tar.gz"             ;;
+    "version"           ) echo "${versionInfo}" && exit 0                              ;;
+    "help"              ) echo "${helpInfo}" && exit 0                                 ;;
+    *                   ) echo "Error: Unsupported architecture $(uname -m)" && exit 1 ;;
 esac
 
-# Download the latest version of starship using curl
+# Check is starship is installed already.
+command -v starship >/dev/null 2>&1 || echo "[+] Installing starship prompt"
 
-curl -sfL -o ${downloadFile} $dirURL/$arch || { echo "Error: Failed to download file"; exit 1; }
+# Download and install the latest version of starship
+curl -sfL -o ${downloadFile} "$dirURL/$arch" || { echo "Error: Failed to download file"; exit 1; }
 
 # Extract the tarball
 tar -xvf ${downloadFile} -C /tmp

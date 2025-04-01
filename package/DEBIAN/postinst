@@ -4,6 +4,8 @@
 case "$1" in
     configure)
         # Enable the service or reload the daemon
+        command -v starship >/dev/null 2>&1 || starship-update
+
         if systemctl is-active --quiet starship-update.timer ; then
             systemctl daemon-reload
         else
