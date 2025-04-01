@@ -3,9 +3,13 @@
 # Automatically added by dh_installinit
 case "$1" in
     configure)
+        # Remove the older starship-prompt package
+        if dpkg-query -W -f='${Status}' starship-prompt 2>/dev/null | grep -q "install ok installed"; then
+            dpkg --purge starship-prompt
+        fi
         # Enable the service or reload the daemon
         command -v starship >/dev/null 2>&1 || starship-update
-
+        # Check if the starship-update.timer is already enabled
         if systemctl is-active --quiet starship-update.timer ; then
             systemctl daemon-reload
         else
