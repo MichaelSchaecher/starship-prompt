@@ -1,0 +1,8 @@
+4327e537a25ee9441609d8d33ada46f4 usr/lib/systemd/starship-update.service
+02ccfb44556573f71bd9daf339e1a0ce usr/lib/systemd/starship-update.timer
+a6e50101e90fc1bbd6b086406d578b6c usr/local/bin/starship-update
+9e307a68022638af1cf694257d6adc73 usr/share/doc/starship-prompt/copyright
+9649de3689605e148382b61098f52eb8 usr/share/doc/starship-update/copyright
+7f3a49c2eedfc6fa497f5a760a12703d usr/share/doc/starship-update/version
+afefb875c3e9a79e71b3dbee2922bfd3 usr/share/doc/starship-update/changelog.DEBIAN.gz
+6ec4c23ea6fb8b28f5feb1d0ce5fb24b usr/share/doc/starship/copyright
