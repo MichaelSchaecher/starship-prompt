@@ -1,65 +1,84 @@
 #!/bin/env make -f
 
-PACKAGE = starship-prompt
-VERSION = $(shell cat VERSION)
+PACKAGE = $(shell basename $(shell pwd))
+VERSION = $(shell bash scripts/set-version)
 
 MAINTAINER = $(shell git config user.name) <$(shell git config user.email)>
 
-INSTALL = systemd, bash (>= 4.4)
-BUILD = debhelper, make (>= 4.1), dpkg-dev, dpkg-changelog
+INSTALL = dpkg-dev, git
+BUILD = debhelper (>= 11), git, make (>= 4.1), dpkg-dev
 
-HOMEPAGE = https:\/\/github.com\/MichaelSchaecher\/$(PACKAGE)
+HOMEPAGE = https://github.com/MichaelSchaecher/ddns
 
-ARCH = amd64
+ARCH = $(shell dpkg --print-architecture)
 
 PACKAGE_DIR = package
 
-export PACKAGE_DIR
+WORKING_DIR = $(shell pwd)
+
+DESCRIPTION = Generate a fstab file for BTRFS subvolumes -
+LONG_DESCRIPTION = Us for creating a fstab file for BTRFS filesystems with multiple subvolumes.
+
+export PACKAGE VERSION MAINTAINER INSTALL BUILD HOMEPAGE ARCH PACKAGE_DIR WORKING_DIR DESCRIPTION LONG_DESCRIPTION
 
 # Phony targets
-.PHONY: all debian clean help
+.PHONY: all debian install clean help
 
 # Default target
-all: debian
+all: install
 
 debian:
 
-	@cp help/control $(PACKAGE_DIR)/DEBIAN/control
-
 	@echo "Building package $(PACKAGE) version $(VERSION)"
 
-	@sed -i "s/Version:/Version: $(VERSION)/" $(PACKAGE_DIR)/DEBIAN/control
-	@sed -i "s/Maintainer:/Maintainer: $(MAINTAINER)/" $(PACKAGE_DIR)/DEBIAN/control
-	@sed -i "s/Homepage:/Homepage: $(HOMEPAGE)/" $(PACKAGE_DIR)/DEBIAN/control
+	@echo "$(VERSION)" > $(PACKAGE_DIR)/usr/share/doc/$(PACKAGE)/version
 
-	@sed -i "s/Depends:/Depends: $(INSTALL)/" $(PACKAGE_DIR)/DEBIAN/control
-	@sed -i "s/Build-Depends:/Build-Depends: $(BUILD)/" $(PACKAGE_DIR)/DEBIAN/control
+ifeq ($(MANPAGE),yes)
+	@pandoc -s -t man man/$(PACKAGE).8.md -o \
+		$(PACKAGE_DIR)/usr/share/man/man8/$(PACKAGE).8
+	@gzip --best -nvf $(PACKAGE_DIR)/usr/share/man/man8/$(PACKAGE).8
+endif
 
-# For some reason the INSTALL variable is being added to BUILD variable at the beginning of the line
-# so we need to remove the that part of the line
-	@sed -i "s/Build-Depends: $(BUILD) $(INSTALL)/Build-Depends: $(BUILD)/" $(PACKAGE_DIR)/DEBIAN/control
+	@dpkg-changelog $(PACKAGE_DIR)/DEBIAN/changelog
+	@dpkg-changelog $(PACKAGE_DIR)/usr/share/doc/$(PACKAGE)/changelog
+	@gzip -d $(PACKAGE_DIR)/DEBIAN/*.gz
+	@mv $(PACKAGE_DIR)/DEBIAN/changelog.DEBIAN $(PACKAGE_DIR)/DEBIAN/changelog
 
-	@help/size
+	@scripts/set-control
+	@scripts/gen-chsums
 
-	@git-changelog $(PACKAGE_DIR)/DEBIAN/changelog
-	@gzip -d $(PACKAGE_DIR)/DEBIAN/changelog.gz
-	@git-changelog $(PACKAGE_DIR)/usr/share/doc/$(PACKAGE)/changelog
-
-	@dpkg-deb --root-owner-group --build $(PACKAGE_DIR) $(PACKAGE)_$(VERSION)_$(ARCH).deb
+ifeq ($(FORCE_DEB),yes)
+	@scripts/mkdeb --force
+else
+	@scripts/mkdeb
+endif
 
 install:
 
-	@dpkg -i package/$(PACKAGE)_$(VERSION)_$(ARCH).deb
+	@if test "$(shell id -u)" != "0"; then \
+		echo "This target requires root privileges. Please run as root or use sudo."; \
+		exit 1; \
+	fi
+
+	@cp -av $(PACKAGE_DIR)/usr /usr
+	@echo "$(VERSION)" > /usr/share/doc/$(PACKAGE)/version
 
 clean:
-	@rm -Rvf $(PACKAGE)_$(VERSION)_$(ARCH).deb
+	@rm -vf $(PACKAGE_DIR)/DEBIAN/control \
+		$(PACKAGE_DIR)/DEBIAN/changelog \
+		$(PACKAGE_DIR)/DEBIAN/md5sums \
+		$(PACKAGE_DIR)/usr/share/doc/$(PACKAGE)/*.gz \
+		$(PACKAGE_DIR)/usr/share/man/man8/$(PACKAGE).8.gz \
+
 help:
 	@echo "Usage: make [target] <variables>"
 	@echo ""
 	@echo "Targets:"
-	@echo "  all       - Build the debian package and install it"
-	@echo "  debian    - Build the debian package"
-	@echo "  install   - Install the debian package"
-	@echo "  clean     - Clean up build files"
-	@echo "  help      - Display this help message"
+	@echo "  all       		- Default target (basic install)"
+	@echo "  debian    		- Build the debian package"
+	@echo "  install   		- Install the basic file (requires root privileges)"
+	@echo "  clean     		- Clean up build files"
+	@echo "  help      		- Display this help message"
 	@echo ""
+	@echo "Variables:"
+	@echo "  FORCE_DEB		- (Default=no) yes = force build debian package even if it exists"	@echo "
