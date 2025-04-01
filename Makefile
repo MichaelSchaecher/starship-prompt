@@ -16,8 +16,8 @@ PACKAGE_DIR = package
 
 WORKING_DIR = $(shell pwd)
 
-DESCRIPTION = Generate a fstab file for BTRFS subvolumes -
-LONG_DESCRIPTION = Us for creating a fstab file for BTRFS filesystems with multiple subvolumes.
+DESCRIPTION = Install and update to the Starship prompt -
+LONG_DESCRIPTION = The Starship prompt is a cross-shell prompt written in rust that is fast & customizable.
 
 export PACKAGE VERSION MAINTAINER INSTALL BUILD HOMEPAGE ARCH PACKAGE_DIR WORKING_DIR DESCRIPTION LONG_DESCRIPTION
 
